@@ -17,6 +17,17 @@ class funVector( val elems: List[Double] ) {
             dot_r(this.elems,rhs.elems)
       }
 
+      def add( rhs: funVector): funVector = {
+            def add_r( lhs: List[Double], rhs: List[Double]): List[Double] = {
+                  ( lhs, rhs) match {
+                        case (Nil,Nil)       => Nil
+                        case ( l::ls, r::rs) => (l + r) :: add_r( ls, rs)
+                        case (_,_)           => Nil
+                  }
+            }
+            new funVector( add_r( elems, rhs.elems))
+      }
+
       def hadamard( rhs: funVector): funVector = {
             // recursive helper
             def had_r(rl: List[Double], ll: List[Double]): List[Double] = {
