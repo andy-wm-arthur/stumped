@@ -1,5 +1,6 @@
 /**
 * @author Andy Arthur
+* @author Ramya Puliadi
 */
 
 class funVector( val elems: List[Double] ) {
@@ -20,7 +21,7 @@ class funVector( val elems: List[Double] ) {
             // recursive helper
             def had_r(rl: List[Double], ll: List[Double]): List[Double] = {
                   (rl,ll) match {
-                        case (Nil,Nil)          => 0                        
+                        case (Nil,Nil)          => Nil                        
                         case (r :: rs, l :: ls) => (r * l) :: had_r(rs,ls)
                         case (_,_)              => Nil // bug: funVector length mismatch is uncaught
                   }
@@ -37,6 +38,16 @@ class funVector( val elems: List[Double] ) {
                   }
             }
             new funVector(map_r(this.elems, f))
+      }
+
+      def len: Int = {
+            def len_r( elems: List[Double]): Int = {
+                  elems match {
+                        case Nil => 0
+                        case e :: es => 1 + len_r(es)
+                  }
+            }
+            len_r(elems)
       }
 
       override def toString() : String = "[ " + elems.mkString(" ") + " ]"
