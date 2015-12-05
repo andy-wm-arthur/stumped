@@ -5,8 +5,6 @@
 import scala.annotation.tailrec
 
 class tailVector( val elems: List[Double] ) {
-
-      override def toString() : String = "[ " + elems.mkString(" ") + " ]"
       
       def dot( rhs: tailVector): Double = {
             // tail recursive helper
@@ -15,7 +13,7 @@ class tailVector( val elems: List[Double] ) {
                   (rl,ll) match {
                         case (Nil,Nil)          => sum
                         case (r :: rs, l :: ls) => ldot( (sum + (r * l)), rs,ls)
-                        case (_,_)              => sum  // bug: tailVector length mismatch is uncaught
+                        case (_,_)              => sum 
                   }
             }
             ldot( 0, this.elems, rhs.elems)
@@ -46,4 +44,6 @@ class tailVector( val elems: List[Double] ) {
             }
             new tailVector( map_r( Nil, this.elems, f).reverse )
       }
+
+      override def toString() : String = "[ " + elems.mkString(" ") + " ]"
 }
