@@ -1,5 +1,6 @@
 /**
 * @author Andy Arthur
+* @author Ramya Puliadi
 */
 
 class funVector( val elems: List[Double] ) {
