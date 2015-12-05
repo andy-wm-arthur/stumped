@@ -20,7 +20,7 @@ class funVector( val elems: List[Double] ) {
             // recursive helper
             def had_r(rl: List[Double], ll: List[Double]): List[Double] = {
                   (rl,ll) match {
-                        case (Nil,Nil)          => 0                        
+                        case (Nil,Nil)          => Nil                        
                         case (r :: rs, l :: ls) => (r * l) :: had_r(rs,ls)
                         case (_,_)              => Nil // bug: funVector length mismatch is uncaught
                   }
