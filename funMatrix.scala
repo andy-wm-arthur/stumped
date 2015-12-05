@@ -4,6 +4,7 @@
 */
 
 
+
 class funMatrix( val vecs: List[funVector] ) {
       /**
        * M x N matrix class: N column vectors of M elems
@@ -78,6 +79,25 @@ class funMatrix( val vecs: List[funVector] ) {
                   }
             }
             new funMatrix( trans_r( vecs, Nil ))
+      }
+
+      def size: (Int,Int) = {
+            /**   returns a tuple: ( number-of-rows, number-of-columns) */
+            def col_size( vecs: List[funVector]): Int = {
+                  vecs match {
+                        case Nil                => 0
+                        case v1 :: v2 :: Nil    => if (v1.len == v2.len) v1.len else -1
+                        case v :: vs            => if (v.len == col_size(vs)) v.len else -1
+                  }
+            }
+            def num_rows( vecs: List[funVector]): Int = {
+                  vecs match {
+                        case Nil     => 0
+                        case v :: vs => 1 + num_rows(vs)
+                  }
+                  
+            }
+            ( num_rows(vecs), col_size(vecs))
       }
 
       override def toString(): String = {
