@@ -5,5 +5,4 @@
 
 class Network( val layers: List[funMatrix]) {
 
-
 }

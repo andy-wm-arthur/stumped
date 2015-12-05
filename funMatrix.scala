@@ -8,7 +8,7 @@ class funMatrix( val vecs: List[funVector] ) {
       /**
        * M x N matrix class: N column vectors of M elems
        */
-      def transMult( rhMat: funMatrix ): funMatrix = {
+      def transMult( rhMat: funMatrix): funMatrix = {
             /** 
              *  transposes the left-hand-side matrix and then computes
              *    matrix multiplication for the two matrices  
@@ -31,6 +31,16 @@ class funMatrix( val vecs: List[funVector] ) {
                   
             }
             new funMatrix( outer( this.vecs, rhMat.vecs))
+      }
+
+      def vecMult( vec: funVector): funVector = {
+            def vecMult_r( x: funVector, vecs: List[funVector]): List[Double] = {
+                  vecs match {
+                        case Nil     => Nil
+                        case v :: vs => (x dot v) :: vecMult_r( x, vs)
+                  }
+            }
+            new funVector( vecMult_r( vec, vecs))
       }
 
       def matrixMap( f: Double => Double): funMatrix = {
