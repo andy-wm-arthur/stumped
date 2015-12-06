@@ -47,16 +47,37 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 		 *		an error matrix using the labels. Back propagates the error, updating the weight matrices
 		 *		using the learning rate. Returns a new network learned on the triaing points
 		 */
+		 def layerProp(z: funMatrix, weight: funMatrix, bias: funVector, sigmoid: Double => Double): funMatrix = {
+		 	val acts = z.matVecMap(sigmoid)	//	transform the raw output of the previous layer with the sigmoid
+		 	(acts transMult weight).matMap( (v: funVector) => v add bias)
+		 }
+		 def gradientDescent( layer: funMatrix, bias: funVector, error: funVector, z: funMatrix, LR: Double): (funMatrix,funVector) = {
+		 	val weightMatrix = new funMatrix(Nil)
+		 	val biasVector	 = new funVector(Nil)
+		 	( weightMatrix, biasVector)
+		 }
+		 def layerError( layer: funMatrix, bias: funVector, z: funMatrix, sigPrime: Double => Double): funVector = {
+		 	new funVector(Nil)
+		 }
 
-		 // def errorMat( ouput: funMatrix, labels: funMatrix, costFunc: (funVector, funVector) => funVector ): funMatrix = {
-		 // 	new funMatrix(Nil)
-		 // }
-
-		 // def updateOutput( weights: List[funMatrix], biases: List[funVector], ) {}
-		 // def updateLayer(weights: funMatrix, biases: funVector)
-
-
-		 def learn_r( acts: funMatrix, layers: List[funMatrix], biases: List[funVector], mp: metaParams ) {}
+		 def learn_r( z: funMatrix, layers: List[funMatrix], biases: List[funVector], 
+		 				labels: funMatrix, mp: metaParams ): (List[funMatrix], List[funVector], funVector) = {
+		 	/**
+		 	 *	Recursive loop that trains the network. Takes the network, training data, and meta parameters as inputs.
+		 	 *	Returns the new weight matrices and bias vectors of the trained network, as well as the error for the most 
+		 	 *	recent layer trained. The error is a vector of errors for each node in the layer.
+		 	 */
+		 	(layers,biases) match {
+		 		// case ( l::Nil, b::Nil) 	=>  // calculate error, update output layer, final weight layer
+		 		case ( l::ls, b::bs) 	=> {
+		 			val newZ		 	= layerProp( z, l, b, mp.sigmoid)
+		 			val ( wL, bL, err)	= learn_r( newZ, ls, bs, labels, mp)
+		 			val ( wM, bV)		= gradientDescent( l, b, err, z, mp.learningRate)
+		 			( wM :: wL, bV :: bL, layerError( l, b, z, mp.sigPrime))
+		 		}
+		 		case (_,_)				=> (List(),List(),new funVector(Nil))	// add error message
+		 	}
+		 }
 
 		 new Network(Nil,Nil)
 	}
