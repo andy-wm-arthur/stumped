@@ -1,4 +1,8 @@
-//Reads in csv file and creates a list of list of doubles
+/**
+* @author Andy Arthur
+* @author Ramya Puliadi
+* @description Reads in csv file and creates a list of list of doubles
+*/
 
 import scala.io.Source
 

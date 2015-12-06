@@ -34,14 +34,18 @@ class funMatrix( val vecs: List[funVector] ) {
             new funMatrix( outer( this.vecs, rhMat.vecs))
       }
 
-      def vecMult( vec: funVector): funVector = {
-            def vecMult_r( x: funVector, vecs: List[funVector]): List[Double] = {
+      def transVecMult( vec: funVector): funVector = {
+            /**
+             *  multiplies the transpose of an M x N matrix A and 
+             *    an M element vector v:  transpose(A)*v
+             */
+            def transVecMult_r( x: funVector, vecs: List[funVector]): List[Double] = {
                   vecs match {
                         case Nil     => Nil
-                        case v :: vs => (x dot v) :: vecMult_r( x, vs)
+                        case v :: vs => (x dot v) :: transVecMult_r( x, vs)
                   }
             }
-            new funVector( vecMult_r( vec, vecs))
+            new funVector( transVecMult_r( vec, vecs))
       }
 
       def matrixMap( f: Double => Double): funMatrix = {
