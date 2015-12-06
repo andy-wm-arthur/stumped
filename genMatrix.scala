@@ -2,9 +2,9 @@
 
 import scala.io.Source
 
-class genMatrix {
+class genMatrix(path:String) {
 	def csvReader(): List[List[Double]] = {
-		val matrix = Source.fromFile("test.csv")
+		val matrix = Source.fromFile(path)
 						.getLines.toList
 						.map(_.split(",").map(_.trim.toDouble)
 						.toList)
