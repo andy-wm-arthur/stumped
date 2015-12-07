@@ -5,8 +5,7 @@
 
 class neuralNet () {
 	def main (args:Array[string]) = {
-		val read = new genMatrix("../resources/test.csv")
-		val matrix: List[List[Double]] = mat.matrix
-
+		val data = new genMatrix("../resources/test.csv")
+		val matrix: List[funVector] = data.matrix
 	}
 }

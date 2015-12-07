@@ -7,9 +7,18 @@
 import scala.io.Source
 
 class genMatrix(path:String) {
-	val matrix: List[List[Double]] = Source.fromFile(path)
+	val lst2d: List[List[Double]] = Source.fromFile(path)
 						.getLines.toList
 						.map(_.split(",").map(_.trim.toDouble)
-						.toList)	
+						.toList)
+
+	def cvtVec (matrix:List[List[Double]]): List[funVector] = {
+		matrix match {
+			case Nil 	=> Nil
+			case l::ls 	=> new funVector(l) :: cvtVec(ls)
+		}
+	}
+
+	val matrix = lst2d.cvtVec	
 }
 
