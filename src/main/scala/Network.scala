@@ -12,8 +12,8 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 		 */
 		val sigmoid: Double => Double, 
 		val sigPrime: Double => Double,
-		val costFunc: (funVector, funVector) => funVector,  
-		val costPrime: (funVector, funVector) => funVector,
+		val costFunc: (funMatrix, funMatrix) => funMatrix,  
+		val costPrime: (funMatrix, funMatrix) => funMatrix,
 		val learningRate: Double
 	) {}
 
@@ -84,9 +84,9 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 		 	( weightMatrix, biasVector)
 		 }
 
-		 def layerError( layer: funMatrix, error: funMatrix, z: funMatrix, sigPrime: Double => Double): funMatrix = {
-		 	(layer transMult error) hadamard z.matVecMap(sigPrime)
-		 }
+		 // def layerError( layer: funMatrix, error: funMatrix, z: funMatrix, sigPrime: Double => Double): funMatrix = {
+		 	
+		 // }
 
 		 def learn_r( z: funMatrix, layers: List[funMatrix], biases: List[funVector], 
 		 				labels: funMatrix, mp: metaParams ): (List[funMatrix], List[funVector], funMatrix) = {
@@ -97,12 +97,17 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 		 	 * 	vector has an error value for each node in a layer. 
 		 	 */
 		 	(layers,biases) match {
-		 		// case ( l::Nil, b::Nil) 	=>  // calculate error, update output layer, final weight layer
+		 		// case ( l::Nil, b::Nil) 	=>  
+		 		case (Nil,Nil)			=> {
+		 			val a = z.matVecMap(mp.sigmoid)
+		 			(Nil,Nil, mp.costPrime(a,labels) hadamard z.matVecMap(mp.sigPrime) )
+		 		}
 		 		case ( l::ls, b::bs) 	=> {
 		 			val newZ		 	= layerProp( z, l, b, mp.sigmoid)
 		 			val ( wL, bL, err)	= learn_r( newZ, ls, bs, labels, mp)
 		 			val ( wM, bV)		= gradientDescent( l, b, err, z, mp)
-		 			( wM :: wL, bV :: bL, layerError( l, err, z, mp.sigPrime))
+		 			val layerError		= (l transMult e) hadamard z.matVecMap(mp.sigPrime)
+		 			( wM :: wL, bV :: bL, layerError)
 		 		}
 		 		case (_,_)				=> (List(),List(),new funMatrix(Nil))	// add error message
 		 	}
