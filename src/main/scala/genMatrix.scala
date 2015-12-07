@@ -19,6 +19,6 @@ class genMatrix(path:String) {
 		}
 	}
 
-	val matrix = lst2d.cvtVec	
+	val matrix = cvtVec(lst2d)
 }
 
