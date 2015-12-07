@@ -47,6 +47,7 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 		 *		an error matrix using the labels. Back propagates the error, updating the weight matrices
 		 *		using the learning rate. Returns a new network learned on the triaing points
 		 */
+
 		 def layerProp(z: funMatrix, weight: funMatrix, bias: funVector, sigmoid: Double => Double): funMatrix = {
 		 	val acts = z.matVecMap(sigmoid)	//	transform the raw output of the previous layer with the sigmoid
 		 	(acts transMult weight).matMap( (v: funVector) => v add bias)
@@ -76,17 +77,12 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 		 		}
 		 		mat_sum_r(mat.vecs)
 		 	}
-
 		 	val a = z.matVecMap(mp.sigmoid)
 		 	val weightMatrix = layer subtract (dyadic_sum( error, a).matVecMap( (d:Double) => mp.learningRate * d))
 			val biasVector 	 = bias subtract (matrix_sum(error)).vecMap( (d:Double) => mp.learningRate * d)
 
 		 	( weightMatrix, biasVector)
 		 }
-
-		 // def layerError( layer: funMatrix, error: funMatrix, z: funMatrix, sigPrime: Double => Double): funMatrix = {
-		 	
-		 // }
 
 		 def learn_r( z: funMatrix, layers: List[funMatrix], biases: List[funVector], 
 		 				labels: funMatrix, mp: metaParams ): (List[funMatrix], List[funVector], funMatrix) = {

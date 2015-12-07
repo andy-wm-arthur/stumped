@@ -3,6 +3,10 @@
 * @author Ramya Puliadi
 */
 
+/**
+ *    @TODO implement folder and binary map functions
+ */
+
 class funVector( val elems: List[Double] ) {
 
       def add( rhs: funVector): funVector = {

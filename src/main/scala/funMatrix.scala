@@ -3,7 +3,9 @@
 * @author Ramya Puliadi
 */
 
-
+/**
+ *	@TODO implement folder and binary map functions
+ */
 
 class funMatrix( val vecs: List[funVector] ) {
 	/**
