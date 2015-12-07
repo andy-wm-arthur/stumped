@@ -102,7 +102,7 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 		 			val newZ		 	= layerProp( z, l, b, mp.sigmoid)
 		 			val ( wL, bL, err)	= learn_r( newZ, ls, bs, labels, mp)
 		 			val ( wM, bV)		= gradientDescent( l, b, err, z, mp)
-		 			val layerError		= (l transMult e) hadamard z.matVecMap(mp.sigPrime)
+		 			val layerError		= (l transMult err) hadamard z.matVecMap(mp.sigPrime)
 		 			( wM :: wL, bV :: bL, layerError)
 		 		}
 		 		case (_,_)				=> (List(),List(),new funMatrix(Nil))	// add error message
