@@ -46,15 +46,15 @@ class funMatrix( val vecs: List[funVector] ) {
 		new funVector( transVecMult_r( vec, vecs))
 	}
 
-	// def matVecMap( f: Double => Double): funMatrix = {
-	// 	def map_r( mat: List[funVector], f: Double => Double): List[funVector] = {
-	// 		mat match {
-	// 		case Nil     => Nil
-	// 		case v :: vs => v.vecMap(f) :: map_r( vs, f)
-	// 		}
-	// 	}
-	// 	new funMatrix( map_r( vecs, f))
-	// }
+	def matVecMap( f: Double => Double): funMatrix = {
+		def map_r( mat: List[funVector], f: Double => Double): List[funVector] = {
+			mat match {
+			case Nil     => Nil
+			case v :: vs => v.vecMap(f) :: map_r( vs, f)
+			}
+		}
+		new funMatrix( map_r( vecs, f))
+	}
 
 	def matMap( f: funVector => funVector): funMatrix = {
 		def map_r( mat: List[funVector], f: funVector => funVector): List[funVector] = {
@@ -90,6 +90,39 @@ class funMatrix( val vecs: List[funVector] ) {
 			}
 		}
 		new funMatrix( trans_r( vecs, Nil ))
+	}
+
+	def add( rhMat: funMatrix): funMatrix = {
+		def add_r( lhMat: List[funVector], rhMat: List[funVector]): List[funVector] = {
+			(lhMat,rhMat) match {
+				case (Nil,Nil) 		=> Nil
+				case (l::ls,r::rs)	=> (l add r) :: add_r(ls,rs)
+				case (_,_)		=> Nil		// error case
+			}
+		}
+		new funMatrix( add_r( this.vecs, rhMat.vecs))
+	}
+
+	def subtract( rhMat: funMatrix): funMatrix = {
+		def sub_r( lhMat: List[funVector], rhMat: List[funVector]): List[funVector] = {
+			(lhMat,rhMat) match {
+				case (Nil,Nil) 		=> Nil
+				case (l::ls,r::rs)	=> (l subtract r) :: sub_r(ls,rs)
+				case (_,_)		=> Nil		// error case
+			}
+		}
+		new funMatrix( sub_r( this.vecs, rhMat.vecs))
+	}
+
+	def hadamard( rhMat: funMatrix): funMatrix = {
+		def had_r( lhMat: List[funVector], rhMat: List[funVector]): List[funVector] = {
+			(lhMat,rhMat) match {
+				case (Nil,Nil) 		=> Nil
+				case (l::ls,r::rs)	=> (l hadamard r) :: had_r(ls,rs)
+				case (_,_)		=> Nil		// error case
+			}
+		}
+		new funMatrix( had_r( this.vecs, rhMat.vecs))
 	}
 
 	def size: (Int,Int) = {

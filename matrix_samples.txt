@@ -14,4 +14,4 @@ val b = new funMatrix( List(
 
 val a = new funMatrix( List(new funVector( List(0, 0, 0, 0, 0)	 ), new funVector( List(0, 1, 2, 3, 4)	 ), new funVector( List(0, 2, 4, 6, 8)	 ), new funVector( List(0, 3, 6, 9, 12) )))
 
-val b = new funMatrix( List(new funVector( List(0, 0, 0, 0, 0)	 ), new funVector( List(0, 1, 2, 3, 4)	 ), new funVector( List(0, 2, 4, 6, 8)	 ), new funVector( List(0, 3, 6, 9, 12) )))
+val b = new funMatrix( List(new funVector( List(0, 0, 0, 0, 0)	 ), new funVector( List(1, 1, 1, 1, 1)	 ), new funVector( List(0, 2, 4, 6, 8)	 ), new funVector( List(0, 0, 0, 0, 0) )))
