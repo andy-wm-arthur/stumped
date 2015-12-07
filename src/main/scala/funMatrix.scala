@@ -46,11 +46,21 @@ class funMatrix( val vecs: List[funVector] ) {
 		new funVector( transVecMult_r( vec, vecs))
 	}
 
-	def matrixMap( f: Double => Double): funMatrix = {
-		def map_r( mat: List[funVector], f: Double => Double): List[funVector] = {
+	// def matVecMap( f: Double => Double): funMatrix = {
+	// 	def map_r( mat: List[funVector], f: Double => Double): List[funVector] = {
+	// 		mat match {
+	// 		case Nil     => Nil
+	// 		case v :: vs => v.vecMap(f) :: map_r( vs, f)
+	// 		}
+	// 	}
+	// 	new funMatrix( map_r( vecs, f))
+	// }
+
+	def matMap( f: funVector => funVector): funMatrix = {
+		def map_r( mat: List[funVector], f: funVector => funVector): List[funVector] = {
 			mat match {
-			case Nil     => Nil
-			case v :: vs => v.vecMap(f) :: map_r( vs, f)
+				case Nil 	 => Nil
+				case v :: vs => f(v) :: map_r( vs, f)
 			}
 		}
 		new funMatrix( map_r( vecs, f))
