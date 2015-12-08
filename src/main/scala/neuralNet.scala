@@ -90,7 +90,7 @@ object neuralNet {
 				case (0,_,_) 			=> (NN,0)
 				case (i,Nil,Nil)		=> (NN,i)
 				case (i, b::bs, l::ls)	=>{
-					println("epoch "+i)
+					println("epochs left: "+i)
 					train_inner( NN.learn( b, l, mp), i-1, bs, ls, mp)
 				}
 				// bug: error case
@@ -134,7 +134,7 @@ object neuralNet {
 		println("initializing network...")
 		val NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
 		println("training...")
-		val trained = train( NN, 50, 100, dataPnts, labels, mp)
+		val trained = train( NN, 200, 600, dataPnts, labels, mp)
 		println("done!")
 	}
 }
