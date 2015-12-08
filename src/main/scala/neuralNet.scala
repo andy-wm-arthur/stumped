@@ -10,6 +10,18 @@ import scala.annotation.tailrec
 
 object neuralNet {
 
+	class metaParams(	
+		/**
+		 *	Struct class to encapsulate meta-parameters
+		 * 	to the Neural Network
+		 */
+		val sigmoid: Double => Double, 
+		val sigPrime: Double => Double,
+		val costFunc: (funMatrix, funMatrix) => funMatrix,  
+		val costPrime: (funMatrix, funMatrix) => funMatrix,
+		val learningRate: Double
+	) {}
+
 	def genDataMatrix( path:String): funMatrix = {
 		def cvtVec (matrix:List[List[Double]]): List[funVector] = {
 			matrix match {
@@ -50,24 +62,30 @@ object neuralNet {
 
 		def genNN_r( structure: List[Int], prng: Random): (List[funMatrix],List[funVector]) = {
 			structure match {
-				case x :: Nil 		 => (Nil,Nil)
+				case x :: Nil 		=> (Nil,Nil)
 				case x1 :: x2 :: xs => {
 					val w = genMatrix( x1, x2, Nil, prng)
 					val b = genVector( x2, Nil, prng)
 					val (ws,bs) = genNN_r( x2 :: xs, prng)
 					( new funMatrix(w)::ws, new funVector(b)::bs)
 				}
+				// bug: error case
+				case _				=> (Nil,Nil)
 			}	
 		}
 		val (weights,biases) = genNN_r( structure, prng)
 		new Network( weights, biases)
 	}
 
+	// def train( NN: Network, batchSize: Int, epochs: Int, )
 
 	def main (args:Array[String]) = {
 		val dataPnts = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST_data/MNIST5.csv")
 		val labels	 = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/labelMatrix.csv")
 		
+		val NN = genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
+
+
 
 	}
 }
