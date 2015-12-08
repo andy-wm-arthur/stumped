@@ -5,17 +5,17 @@
 
 class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 
-	class metaParams(	
-		/**
-		 *	Struct class to encapsulate meta-parameters
-		 * 	to the Neural Network
-		 */
-		val sigmoid: Double => Double, 
-		val sigPrime: Double => Double,
-		val costFunc: (funMatrix, funMatrix) => funMatrix,  
-		val costPrime: (funMatrix, funMatrix) => funMatrix,
-		val learningRate: Double
-	) {}
+	// class metaParams(	
+	// 	/**
+	// 	 *	Struct class to encapsulate meta-parameters
+	// 	 * 	to the Neural Network
+	// 	 */
+	// 	val sigmoid: Double => Double, 
+	// 	val sigPrime: Double => Double,
+	// 	val costFunc: (funMatrix, funMatrix) => funMatrix,  
+	// 	val costPrime: (funMatrix, funMatrix) => funMatrix,
+	// 	val learningRate: Double
+	// ) {}
 
 	def forwardProp( dataPnt: funVector, sigmoid: Double => Double): funVector = {
 		/**

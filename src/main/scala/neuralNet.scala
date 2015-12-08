@@ -7,20 +7,22 @@ import scala.io.Source
 import scala.util.Random
 import scala.compat.Platform
 import scala.annotation.tailrec
+import scala.math._
+
 
 object neuralNet {
 
-	class metaParams(	
-		/**
-		 *	Struct class to encapsulate meta-parameters
-		 * 	to the Neural Network
-		 */
-		val sigmoid: Double => Double, 
-		val sigPrime: Double => Double,
-		val costFunc: (funMatrix, funMatrix) => funMatrix,  
-		val costPrime: (funMatrix, funMatrix) => funMatrix,
-		val learningRate: Double
-	) {}
+	// class metaParams(	
+	// 	/**
+	// 	 *	Struct class to encapsulate meta-parameters
+	// 	 * 	to the Neural Network
+	// 	 */
+	// 	val sigmoid: Double => Double, 
+	// 	val sigPrime: Double => Double,
+	// 	val costFunc: (funMatrix, funMatrix) => funMatrix,  
+	// 	val costPrime: (funMatrix, funMatrix) => funMatrix,
+	// 	val learningRate: Double
+	// ) {}
 
 	def genDataMatrix( path:String): funMatrix = {
 		def cvtVec (matrix:List[List[Double]]): List[funVector] = {
@@ -78,18 +80,52 @@ object neuralNet {
 	}
 
 	def train( NN: Network, batchSize: Int, epochs: Int, trainData:funMatrix, labels:funMatrix, mp: metaParams ): Network = {
+		def train_inner(NN: Network, epochs: Int, batches: List[funMatrix], 
+						labelSets: List[funMatrix], mp: metaParams ): (Network,Int) = {
+			/**
+			 *	Iterates through epochs stopping if the epochs or training batches are exhausted. Returns the most recently
+			 * 	trained network and the number of epochs left	
+			 */
+			(epochs,batches,labelSets) match {
+				case (0,_,_) 			=> (NN,0)
+				case (i,Nil,Nil)		=> (NN,i)
+				case (i, b::bs, l::ls)	=> train_inner( NN.learn( b, l, mp), i-1, bs, ls, mp)
+				// bug: error case
+				case (_,_,_)			=> (new Network(Nil,Nil),0)
+			}
+		}
+		def train_outer(NN: Network, epochs: Int, batches: List[funMatrix], 
+						labelSets: List[funMatrix], mp: metaParams ): Network = {
+			epochs match {
+				case 0 => NN
+				case i => {
+					val (new_net,new_i) = train_inner( NN, i, batches, labelSets, mp)
+					train_outer( new_net, new_i, batches, labelSets, mp)
+				}
+			}
+
+		}
+
 		val batches = trainData.split(batchSize)
 		val labelSets = labels.split(batchSize)
-		new Network(Nil,Nil)
+
+		train_outer( NN, epochs, batches, labelSets, mp)
 	}
 
 	def main (args:Array[String]) = {
 		val dataPnts = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST_data/MNIST5.csv")
 		val labels	 = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/labelMatrix.csv")
 		
-		val NN = genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
+		val sigmoid = (d:Double) => (1/(1 + exp(-d)))
+		val mp = new metaParams(
+			sigmoid,
+			(d:Double) => sigmoid(d) * (1-sigmoid(d)),
+			(m1:funMatrix,m2:funMatrix) => m1,
+			(m1:funMatrix,m2:funMatrix) => m1 subtract m2,
+			0.2
+		)
 
-
-
+		val NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
+		val trained = train( NN, 50, 100, dataPnts, labels, mp)
 	}
 }
