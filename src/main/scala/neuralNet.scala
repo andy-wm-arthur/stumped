@@ -89,7 +89,10 @@ object neuralNet {
 			(epochs,batches,labelSets) match {
 				case (0,_,_) 			=> (NN,0)
 				case (i,Nil,Nil)		=> (NN,i)
-				case (i, b::bs, l::ls)	=> train_inner( NN.learn( b, l, mp), i-1, bs, ls, mp)
+				case (i, b::bs, l::ls)	=>{
+					println("epoch "+i)
+					train_inner( NN.learn( b, l, mp), i-1, bs, ls, mp)
+				}
 				// bug: error case
 				case (_,_,_)			=> (new Network(Nil,Nil),0)
 			}
@@ -113,9 +116,7 @@ object neuralNet {
 	}
 
 	def main (args:Array[String]) = {
-		val dataPnts = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST_data/MNIST5.csv")
-		val labels	 = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/labelMatrix.csv")
-		
+
 		val sigmoid = (d:Double) => (1/(1 + exp(-d)))
 		val mp = new metaParams(
 			sigmoid,
@@ -125,7 +126,15 @@ object neuralNet {
 			0.2
 		)
 
+		println("importing trainging data...")
+		val dataPnts = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST_data/MNIST5.csv")
+		println("importing trainging labels...")
+		val labels	 = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/labelMatrix.csv")
+
+		println("initializing network...")
 		val NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
+		println("training...")
 		val trained = train( NN, 50, 100, dataPnts, labels, mp)
+		println("done!")
 	}
 }
