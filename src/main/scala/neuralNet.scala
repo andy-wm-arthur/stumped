@@ -77,7 +77,11 @@ object neuralNet {
 		new Network( weights, biases)
 	}
 
-	// def train( NN: Network, batchSize: Int, epochs: Int, )
+	def train( NN: Network, batchSize: Int, epochs: Int, trainData:funMatrix, labels:funMatrix, mp: metaParams ): Network = {
+		val batches = trainData.split(batchSize)
+		val labelSets = labels.split(batchSize)
+		new Network(Nil,Nil)
+	}
 
 	def main (args:Array[String]) = {
 		val dataPnts = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST_data/MNIST5.csv")

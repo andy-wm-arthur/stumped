@@ -127,6 +127,29 @@ class funMatrix( val vecs: List[funVector] ) {
 		new funMatrix( had_r( this.vecs, rhMat.vecs))
 	}
 
+	def split( size: Int): List[funMatrix] = {
+		def mk_split( size: Int, vecs: List[funVector]): (List[funVector],List[funVector]) = {
+			(size,vecs) match {
+				case (0,vs) => (Nil,vs)
+				case ( x, v :: vs) => {
+					val (split,whole) = mk_split( x-1, vs)
+					( v::split, whole)
+				}
+				case ( x, Nil) => (Nil,Nil)
+			}
+		}
+		def split_r( size: Int, vecs: List[funVector]): List[funMatrix] = {
+			vecs match {
+				case Nil 	 => Nil
+				case vs => {
+					val(split,whole) = mk_split( size, vs)
+					new funMatrix(split) :: split_r(size,whole)
+				}
+			}
+		}
+		split_r( size, vecs)
+	}
+
 	def size: (Int,Int) = {
 		/**   returns a tuple: ( number-of-rows, number-of-columns) */
 		def col_size( vecs: List[funVector]): Int = {
