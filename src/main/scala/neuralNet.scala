@@ -94,7 +94,7 @@ object neuralNet {
 					train_inner( NN.learn( b, l, mp), i-1, bs, ls, mp)
 				}
 				// bug: error case
-				case (_,_,_)			=> (new Network(Nil,Nil),0)
+				case (_,_,_)			=> { println("error in train_inner in train") ;(new Network(Nil,Nil),0) }
 			}
 		}
 		def train_outer(NN: Network, epochs: Int, batches: List[funMatrix], 
