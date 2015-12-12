@@ -34,7 +34,7 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 					fprop_r( ls, bs, a, sigmoid )
 				}
 				//	this is an error case
-				case (_,_)	=> { println("error: weight, bias mismatch"); new funVector(List())}
+				case (_,_)	=> { println("error: weight, bias mismatch in forwardProp"); new funVector(List())}
 			}
 		}
 		fprop_r( this.layers, this.biases, dataPnt, sigmoid)
@@ -62,7 +62,7 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 			 		(error,act) match {
 			 			case (e:: Nil,a :: Nil)	=> (e dyadic a)
 			 			case (e :: es,a :: as) 	=> (e dyadic a) add (d_sum_r( es, as))
-			 			case (_,_)				=> new funMatrix(Nil)	//	error case
+			 			case (_,_)				=> { println("error in dyadic_sum in gradientDescent"); new funMatrix(Nil)}	//	error case
 			 		}
 			 	}
 			 	d_sum_r( error.vecs, actMat.vecs)
@@ -72,7 +72,7 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 		 			mat match {
 		 				case m :: Nil => m
 		 				case m :: ms  => m add mat_sum_r(ms)
-		 				case Nil 	  => new funVector(Nil)
+		 				case Nil 	  => { println("error in matrix_sum in gradientDescent"); new funVector(Nil)}
 		 			}
 		 		}
 		 		mat_sum_r(mat.vecs)
@@ -105,7 +105,7 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 		 			val layerError		= (l transMult err) hadamard z.matVecMap(mp.sigPrime)
 		 			( wM :: wL, bV :: bL, layerError)
 		 		}
-		 		case (_,_)				=> (List(),List(),new funMatrix(Nil))	// add error message
+		 		case (_,_)				=> { println("error in learn_r"); (List(),List(),new funMatrix(Nil))}	// add error message
 		 	}
 		 }
 
