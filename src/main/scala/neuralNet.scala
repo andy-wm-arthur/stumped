@@ -134,7 +134,6 @@ object neuralNet {
 		val NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
 		println("training...")
 		train( NN, 200, 600, dataPnts, labels, mp)
-		println("done")
 	}
 
 	def main (args:Array[String]) = {
