@@ -34,7 +34,8 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 					fprop_r( ls, bs, a, sigmoid )
 				}
 				//	this is an error case
-				case (_,_)	=> { println("error: weight, bias mismatch in forwardProp"); new funVector(List())}
+
+				case (_,_)	=> { println("error: weight, bias mismatch in forwardProp()"); new funVector(List())}
 			}
 		}
 		fprop_r( this.layers, this.biases, dataPnt, sigmoid)

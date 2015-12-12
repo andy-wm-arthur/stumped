@@ -99,7 +99,7 @@ class funMatrix( val vecs: List[funVector] ) {
 			(lhMat,rhMat) match {
 				case (Nil,Nil) 		=> Nil
 				case (l::ls,r::rs)	=> (l add r) :: add_r(ls,rs)
-				case (_,_)		=> Nil		// error case
+				case (_,_)		=> { println("error: size mismatch in funMatrix add"); Nil}
 			}
 		}
 		new funMatrix( add_r( this.vecs, rhMat.vecs))
@@ -110,7 +110,7 @@ class funMatrix( val vecs: List[funVector] ) {
 			(lhMat,rhMat) match {
 				case (Nil,Nil) 		=> Nil
 				case (l::ls,r::rs)	=> (l subtract r) :: sub_r(ls,rs)
-				case (_,_)		=> Nil		// error case
+				case (_,_)		=> {println("error: size mismatch in funMatrix subtract"); Nil}
 			}
 		}
 		new funMatrix( sub_r( this.vecs, rhMat.vecs))
@@ -121,7 +121,7 @@ class funMatrix( val vecs: List[funVector] ) {
 			(lhMat,rhMat) match {
 				case (Nil,Nil) 		=> Nil
 				case (l::ls,r::rs)	=> (l hadamard r) :: had_r(ls,rs)
-				case (_,_)		=> Nil		// error case
+				case (_,_)		=> {println("error: size mismatch in funMatrix hadamard"); Nil}
 			}
 		}
 		new funMatrix( had_r( this.vecs, rhMat.vecs))
