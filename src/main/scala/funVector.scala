@@ -14,7 +14,7 @@ class funVector( val elems: List[Double] ) {
                   ( lhs, rhs) match {
                         case (Nil,Nil)       => Nil
                         case ( l::ls, r::rs) => (l + r) :: add_r( ls, rs)
-                        case (_,_)           => Nil
+                        case (_,_)           => {println("error: size mismatch in funVector add"); Nil}
                   }
             }
             new funVector( add_r( elems, rhs.elems))
@@ -25,7 +25,7 @@ class funVector( val elems: List[Double] ) {
                   (lhs,rhs) match {
                         case (Nil,Nil)     => Nil
                         case (l::ls,r::rs) => (l-r) :: sub_r( ls, rs)
-                        case (_,_)         => Nil
+                        case (_,_)         => {println("error: size mismatch in funVector subtract"); Nil}
                   }
             }
             new funVector( sub_r( this.elems, rhs.elems))
@@ -37,7 +37,7 @@ class funVector( val elems: List[Double] ) {
                   (rl,ll) match {
                         case (Nil,Nil)          => 0
                         case (r :: rs, l :: ls) => (r * l) + dot_r(rs,ls)
-                        case (_,_)              => 0 
+                        case (_,_)              => {println("error: size mismatch in funVector dot"); 0}
                   }
             }
             dot_r(this.elems,rhs.elems)
@@ -49,7 +49,7 @@ class funVector( val elems: List[Double] ) {
                   (rl,ll) match {
                         case (Nil,Nil)          => Nil                        
                         case (r :: rs, l :: ls) => (r * l) :: had_r(rs,ls)
-                        case (_,_)              => Nil // bug: funVector length mismatch is uncaught
+                        case (_,_)              => {println("error: size mismatch in funVector hadamard"); Nil}
                   }
             }
             new funVector( had_r(this.elems, rhs.elems) )
