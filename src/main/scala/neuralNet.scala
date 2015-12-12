@@ -136,7 +136,29 @@ object neuralNet {
 		train( NN, 200, 600, dataPnts, labels, mp)
 	}
 
-	def main (args:Array[String]) = {
+def debug() {
+		val sigmoid = (d:Double) => (1/(1 + exp(-d)))
+		val mp = new metaParams(
+			sigmoid,
+			(d:Double) => sigmoid(d) * (1-sigmoid(d)),
+			(m1:funMatrix,m2:funMatrix) => m1,
+			(m1:funMatrix,m2:funMatrix) => m1 subtract m2,
+			0.2
+		)
 
+		println("importing trainging data...")
+		val dataPnts = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST_data/MNIST5.csv")
+		println("importing trainging labels...")
+		val labels	 = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/labelMatrix.csv")
+
+		println("initializing network...")
+		val NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
+		
+		for( l <- NN.layers) println( l.size )
+		for( b <- NN.biases) println( b.len )
+	}
+
+	def main (args:Array[String]) = {
+		debug()
 	}
 }

@@ -11,6 +11,10 @@ class funMatrix( val vecs: List[funVector] ) {
 	/**
 	* M x N matrix class: N column vectors of M elems
 	*/
+	def multiply( rhMat: funMatrix): funMatrix = {
+		this.transpose transMult rhMat
+	}
+
 	def transMult( rhMat: funMatrix): funMatrix = {
 		/** 
 		*  transposes the left-hand-side matrix and then computes
