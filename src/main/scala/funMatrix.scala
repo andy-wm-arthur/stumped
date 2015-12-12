@@ -163,13 +163,14 @@ class funMatrix( val vecs: List[funVector] ) {
 				case v :: vs            => if (v.len == col_size(vs)) v.len else -1
 			}
 		}
-		def num_rows( vecs: List[funVector]): Int = {
+		def num_cols( vecs: List[funVector]): Int = {
 			vecs match {
 				case Nil     => 0
-				case v :: vs => 1 + num_rows(vs)
+				case v :: vs => 1 + num_cols(vs)
 			}
 		}
-		( num_rows(vecs), col_size(vecs))
+		//	M x N
+		( col_size(vecs), num_cols(vecs) )
 	}
 
 	override def toString(): String = {

@@ -133,10 +133,10 @@ object neuralNet {
 		println("initializing network...")
 		val NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
 		println("training...")
-		train( NN, 50, 10, dataPnts.transpose, labels, mp)
+		train( NN, 50, 10, dataPnts, labels, mp)
 	}
 
-def debug() {
+	def debug() {
 		val sigmoid = (d:Double) => (1/(1 + exp(-d)))
 		val mp = new metaParams(
 			sigmoid,
@@ -154,11 +154,14 @@ def debug() {
 		println("initializing network...")
 		val NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
 		
-		for( l <- NN.layers) println( l.size )
-		for( b <- NN.biases) println( b.len )
+		println("training data matrix:\t" + dataPnts.size)
+		println("training label matrix:\t" + labels.size)
+		for( l <- NN.layers) println("weight matrix:\t\t" + l.size )
+		for( b <- NN.biases) println("bias matrix:\t\t" + b.len )
 	}
 
-	def main (args:Array[String]) = {
+	def main (args:Array[String]) {
+		debug()
 		test()
-	}
+	}	
 }
