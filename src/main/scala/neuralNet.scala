@@ -133,7 +133,7 @@ object neuralNet {
 		println("initializing network...")
 		val NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
 		println("training...")
-		train( NN, 200, 600, dataPnts, labels, mp)
+		train( NN, 50, 10, dataPnts.transpose, labels, mp)
 	}
 
 def debug() {
@@ -159,6 +159,6 @@ def debug() {
 	}
 
 	def main (args:Array[String]) = {
-		debug()
+		test()
 	}
 }

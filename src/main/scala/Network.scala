@@ -51,7 +51,7 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 
 		 def layerProp(z: funMatrix, weight: funMatrix, bias: funVector, sigmoid: Double => Double): funMatrix = {
 		 	val acts = z.matVecMap(sigmoid)	//	transform the raw output of the previous layer with the sigmoid
-		 	(acts transMult weight).matMap( (v: funVector) => v add bias)
+		 	(acts multiply weight).matMap( (v: funVector) => v add bias)
 		 }
 
 		 def gradientDescent( layer: funMatrix, bias: funVector, error: funMatrix, z: funMatrix, mp: metaParams): (funMatrix,funVector) = {
