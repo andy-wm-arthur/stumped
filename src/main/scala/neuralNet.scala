@@ -126,46 +126,29 @@ object neuralNet {
 		val dataPnts = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST_data/MNIST5.csv")
 		println("importing training labels...")
 		val labels	 = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST5_labelMatrix.csv")
-
-		println("initializing network...")
-		val NN 		= genNeuralNetwork( structure, new Random(Platform.currentTime))
-		println("training...")
-		train( NN, batchSize, epochs, dataPnts, labels, mp)
-	}
-
-	def debug() {
-		val sigmoid = (d:Double) => (1/(1 + exp(-d)))
-		val mp = new metaParams(
-			sigmoid,
-			(d:Double) => sigmoid(d) * (1-sigmoid(d)),
-			(m1:funMatrix,m2:funMatrix) => m1,	// dummy cost function
-			(m1:funMatrix,m2:funMatrix) => m1 subtract m2,
-			0.2
-		)
-
-		println("importing training data...")
-		val dataPnts = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST_data/MNIST5.csv")
-		println("importing training labels...")
-		val labels	 = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST5_labelMatrix.csv")
-
+		println("importing test data...")
+		val testData = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/test_points.csv")
 		println("initializing network...")
 		val NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
 		
-		println("training data matrix:\t" + dataPnts.size)
-		println("training label matrix:\t" + labels.size)
-		for( l <- NN.layers) println("weight matrix:\t\t" + l.size )
-		for( b <- NN.biases) println("bias matrix:\t\t" + b.len )
+		println("output pre-training:")
+		val testOutput = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
+		println(testOutput)
+
+		println("training...")
+		train( NN, batchSize, epochs, dataPnts, labels, mp)
+
+		println("output post-training:")
+		val testOutput = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
+		println(testOutput)
 	}
 
 	def main (args:Array[String]) {
 		debug()
-		val NN = test(List(784,28,10), 200, 50)
-		val testData = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/test_points.csv")
+		val NN = test(List(784,28,10), 10, 1)
 
-		for( l <- NN.layers) println("weight matrix:\t\t" + l.size )
-		for( b <- NN.biases) println("bias matrix:\t\t" + b.len )
 
-		val testOutput = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
-		println(testOutput)
+
+		
 	}	
 }
