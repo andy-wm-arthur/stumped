@@ -12,17 +12,14 @@ import scala.math._
 
 object neuralNet {
 
-	// class metaParams(	
-	// 	/**
-	// 	 *	Struct class to encapsulate meta-parameters
-	// 	 * 	to the Neural Network
-	// 	 */
-	// 	val sigmoid: Double => Double, 
-	// 	val sigPrime: Double => Double,
-	// 	val costFunc: (funMatrix, funMatrix) => funMatrix,  
-	// 	val costPrime: (funMatrix, funMatrix) => funMatrix,
-	// 	val learningRate: Double
-	// ) {}
+	/**	@TODO
+	 *	remove non-prime cost function from metaParams
+	 *	make meta-params part of Network constructor
+	 *	add mappings from output vectors to class string
+	 *	convert functions to tail recursion
+	 *	implement more efficient matrix multiplication
+	 *	implement a binary map to improve funMatrix and funVector src
+	 */
 
 	def genDataMatrix( path:String): funMatrix = {
 		def cvtVec (matrix:List[List[Double]]): List[funVector] = {
@@ -120,7 +117,7 @@ object neuralNet {
 		val mp = new metaParams(
 			sigmoid,
 			(d:Double) => sigmoid(d) * (1-sigmoid(d)),
-			(m1:funMatrix,m2:funMatrix) => m1,
+			(m1:funMatrix,m2:funMatrix) => m1,	// dummy cost function
 			(m1:funMatrix,m2:funMatrix) => m1 subtract m2,
 			0.2
 		)
@@ -141,7 +138,7 @@ object neuralNet {
 		val mp = new metaParams(
 			sigmoid,
 			(d:Double) => sigmoid(d) * (1-sigmoid(d)),
-			(m1:funMatrix,m2:funMatrix) => m1,
+			(m1:funMatrix,m2:funMatrix) => m1,	// dummy cost function
 			(m1:funMatrix,m2:funMatrix) => m1 subtract m2,
 			0.2
 		)
@@ -162,7 +159,7 @@ object neuralNet {
 
 	def main (args:Array[String]) {
 		debug()
-		val NN = test(List(784,28,10), 200, 10)
+		val NN = test(List(784,28,10), 200, 50)
 		val testData = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/test_points.csv")
 
 		for( l <- NN.layers) println("weight matrix:\t\t" + l.size )

@@ -5,17 +5,6 @@
 
 class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 
-	// class metaParams(	
-	// 	/**
-	// 	 *	Struct class to encapsulate meta-parameters
-	// 	 * 	to the Neural Network
-	// 	 */
-	// 	val sigmoid: Double => Double, 
-	// 	val sigPrime: Double => Double,
-	// 	val costFunc: (funMatrix, funMatrix) => funMatrix,  
-	// 	val costPrime: (funMatrix, funMatrix) => funMatrix,
-	// 	val learningRate: Double
-	// ) {}
 
 	def computeOutput( dataPnt: funVector, sigmoid: Double => Double): funVector = {
 		/**
@@ -73,6 +62,9 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 		 *		using the learning rate. Returns a new network learned on the triaing points
 		 */
 
+		 // m = number of training points
+		 val (_,m) = trainingPnts.size
+
 		 def layerProp(z: funMatrix, weight: funMatrix, bias: funVector, sigmoid: Double => Double): funMatrix = {
 		 	val acts = z.matVecMap(sigmoid)	//	transform the raw output of the previous layer with the sigmoid
 		 	( weight multiply acts ).matMap( (v: funVector) => v add bias)
@@ -103,7 +95,7 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 		 		mat_sum_r(mat.vecs)
 		 	}
 		 	val a = z.matVecMap(mp.sigmoid)
-		 	val weightMatrix = layer subtract (dyadic_sum( error, a).matVecMap( (d:Double) => mp.learningRate * d))
+		 	val weightMatrix = layer subtract (dyadic_sum( error, a).matVecMap( (d:Double) => mp.learningRate * d / m))
 			val biasVector 	 = bias subtract (matrix_sum(error)).vecMap( (d:Double) => mp.learningRate * d)
 
 		 	( weightMatrix, biasVector)
