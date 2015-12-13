@@ -112,7 +112,7 @@ object neuralNet {
 		train_outer( NN, epochs, batches, labelSets, mp)
 	}
 
-	def test( structure:List[Int], batchSize:Int, epochs:Int ): Network = {
+	def test( structure:List[Int], batchSize:Int, epochs:Int ) {
 		val sigmoid = (d:Double) => (1/(1 + exp(-d)))
 		val mp = new metaParams(
 			sigmoid,
@@ -132,23 +132,18 @@ object neuralNet {
 		val NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
 		
 		println("output pre-training:")
-		val testOutput = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
-		println(testOutput)
+		val testOutput_pre = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
+		println(testOutput_pre)
 
 		println("training...")
 		train( NN, batchSize, epochs, dataPnts, labels, mp)
 
 		println("output post-training:")
-		val testOutput = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
-		println(testOutput)
+		val testOutput_post = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
+		println(testOutput_post)
 	}
 
 	def main (args:Array[String]) {
-		debug()
-		val NN = test(List(784,28,10), 10, 1)
-
-
-
-		
+		test(List(784,28,10), 10, 1)		
 	}	
 }
