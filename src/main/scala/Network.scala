@@ -17,12 +17,12 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 	// 	val learningRate: Double
 	// ) {}
 
-	def forwardProp( dataPnt: funVector, sigmoid: Double => Double): funVector = {
+	def computeOutput( dataPnt: funVector, sigmoid: Double => Double): funVector = {
 		/**
 		 * 	Computes the output for a single input data point
-		 *		a(l+1) = sigmoid( transpose(w(l+1)) * a(l) + bias(l+1))
+		 *		a(l+1) = sigmoid( w(l+1) * a(l) + bias(l+1))
 		 */
-		def fprop_r( layers: List[funMatrix], biases: List[funVector], 
+		def cmptOut_r( layers: List[funMatrix], biases: List[funVector], 
 					 activations: funVector, sigmoid: Double => Double): funVector = {
 
 			(layers, biases) match {
@@ -31,14 +31,38 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 				//	hidden layer
 				case ( l::ls, b::bs) => {
 					val a = ((l transVecMult activations) add b).vecMap(sigmoid)
-					fprop_r( ls, bs, a, sigmoid )
+					cmptOut_r( ls, bs, a, sigmoid )
 				}
 				//	this is an error case
 
 				case (_,_)	=> { println("error: weight, bias mismatch in forwardProp()"); new funVector(List())}
 			}
 		}
-		fprop_r( this.layers, this.biases, dataPnt, sigmoid)
+		cmptOut_r( this.layers, this.biases, dataPnt, sigmoid)
+	}
+
+	def computeOutput( dataMat: funMatrix, sigmoid: Double => Double): funMatrix = {
+		/**
+		 * 	Computes the output for a matrix of data points
+		 *		a(l+1) = sigmoid( w(l+1) * a(l) + bias(l+1))
+		 */
+		def cmptOut_r( layers: List[funMatrix], biases: List[funVector], 
+					 activations: funMatrix, sigmoid: Double => Double): funMatrix = {
+
+			(layers, biases) match {
+				//	output layer
+				case (Nil,Nil) 		=> activations
+				//	hidden layer
+				case ( l::ls, b::bs) => {
+					val a = ((l multiply activations).matMap( (v: funVector) => v add b)).matVecMap(sigmoid)
+					cmptOut_r( ls, bs, a, sigmoid )
+				}
+				//	this is an error case
+
+				case (_,_)	=> { println("error: weight, bias mismatch in forwardProp()"); new funMatrix(Nil)}
+			}
+		}
+		cmptOut_r( this.layers, this.biases, dataMat, sigmoid)
 	}
 
 	def learn( trainingPnts: funMatrix, labels: funMatrix, mp: metaParams): Network = {

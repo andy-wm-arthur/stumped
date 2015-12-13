@@ -115,7 +115,7 @@ object neuralNet {
 		train_outer( NN, epochs, batches, labelSets, mp)
 	}
 
-	def test(): Network = {
+	def test( structure:List[Int], batchSize:Int, epochs:Int ): Network = {
 		val sigmoid = (d:Double) => (1/(1 + exp(-d)))
 		val mp = new metaParams(
 			sigmoid,
@@ -128,12 +128,12 @@ object neuralNet {
 		println("importing trainging data...")
 		val dataPnts = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST_data/MNIST5.csv")
 		println("importing trainging labels...")
-		val labels	 = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/labelMatrix.csv")
+		val labels	 = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST5_labelMatrix.csv")
 
 		println("initializing network...")
-		val NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
+		val NN 		= genNeuralNetwork( structure, new Random(Platform.currentTime))
 		println("training...")
-		train( NN, 50, 10, dataPnts, labels, mp)
+		train( NN, batchSize, epochs, dataPnts, labels, mp)
 	}
 
 	def debug() {
@@ -162,6 +162,13 @@ object neuralNet {
 
 	def main (args:Array[String]) {
 		debug()
-		test()
+		val NN = test(List(784,28,10), 200, 10)
+		val testData = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/test_points.csv")
+
+		for( l <- NN.layers) println("weight matrix:\t\t" + l.size )
+		for( b <- NN.biases) println("bias matrix:\t\t" + b.len )
+
+		val testOutput = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
+		println(testOutput)
 	}	
 }
