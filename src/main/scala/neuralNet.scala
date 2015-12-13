@@ -19,6 +19,7 @@ object neuralNet {
 	 *	convert functions to tail recursion
 	 *	implement more efficient matrix multiplication
 	 *	implement a binary map to improve funMatrix and funVector src
+	 *	cleanup resource directory
 	 */
 
 	def genDataMatrix( path:String): funMatrix = {
@@ -89,7 +90,7 @@ object neuralNet {
 				case (0,_,_) 			=> (NN,0)
 				case (i,Nil,Nil)		=> (NN,i)
 				case (i, b::bs, l::ls)	=>{
-					println("epochs left: "+i)
+					if (i % 100 == 0) println("epochs left: "+i)
 					train_inner( NN.learn( b, l, mp), i-1, bs, ls, mp)
 				}
 				// bug: error case
@@ -127,7 +128,7 @@ object neuralNet {
 		println("importing training data...")
 		val dataPnts = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST_data/MNIST_10k.csv")
 		println("importing training labels...")
-		val labels	 = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST5_labelMatrix.csv")
+		val labels	 = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST_labels/10k_lbl_strings.csv")
 		println("importing test data...")
 		val testData = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/test_points.csv")
 		println("initializing network...")
@@ -148,6 +149,6 @@ object neuralNet {
 	}
 
 	def main (args:Array[String]) {
-		test(List(784,28,10), 10, 12600)		
+		test(List(784,28,10), 10, 126000)		
 	}	
 }
