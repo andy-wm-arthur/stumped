@@ -3,10 +3,11 @@
 * @author Ramya Puliadi
 */
 
-import java.text.DecimalFormat
+// import java.text.DecimalFormat
 
-/**
- *	@TODO implement folder and binary map functions
+/**	@TODO 
+ *	implement folder and binary map functions
+ *	format doubles in matrix printing
  */
 
 class funMatrix( val vecs: List[funVector] ) {

@@ -22,10 +22,12 @@ object neuralNet {
 	 */
 
 	def genDataMatrix( path:String): funMatrix = {
-		def cvtVec (matrix:List[List[Double]]): List[funVector] = {
+		@tailrec
+		def cvtVec (agg: List[funVector], matrix:List[List[Double]]): List[funVector] = {
+
 			matrix match {
-				case Nil 	=> Nil
-				case l::ls 	=> new funVector(l) :: cvtVec(ls)
+				case Nil 	=> agg
+				case l::ls 	=> cvtVec( new funVector(l) :: agg, ls)
 			}
 		}
 		val lst2d: List[List[Double]] = Source.fromFile(path)
@@ -33,7 +35,7 @@ object neuralNet {
 							.map(_.split(",").map(_.trim.toDouble)
 							.toList)
 
-		new funMatrix( cvtVec(lst2d))
+		new funMatrix( cvtVec( Nil, lst2d))
 	}
 	
 	def genNeuralNetwork( structure: List[Int], prng: Random): Network = {
@@ -123,29 +125,29 @@ object neuralNet {
 		)
 
 		println("importing training data...")
-		val dataPnts = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST_data/MNIST5.csv")
+		val dataPnts = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST_data/MNIST_10k.csv")
 		println("importing training labels...")
 		val labels	 = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST5_labelMatrix.csv")
 		println("importing test data...")
 		val testData = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/test_points.csv")
 		println("initializing network...")
-		val NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
+		var NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
 		
 		//for( layer <- NN.layers) println(layer)
 
-		println("output pre-training:")
+		println("\noutput pre-training:")
 		val testOutput_pre = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
 		println(testOutput_pre)
 
 		println("training...")
-		train( NN, batchSize, epochs, dataPnts, labels, mp)
+		NN = train( NN, batchSize, epochs, dataPnts, labels, mp)
 
-		println("output post-training:")
+		println("\noutput post-training:")
 		val testOutput_post = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
 		println(testOutput_post)
 	}
 
 	def main (args:Array[String]) {
-		test(List(784,28,10), 200, 10)		
+		test(List(784,28,10), 10, 12600)		
 	}	
 }
