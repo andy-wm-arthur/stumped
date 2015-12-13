@@ -3,6 +3,8 @@
 * @author Ramya Puliadi
 */
 
+import java.text.DecimalFormat
+
 /**
  *	@TODO implement folder and binary map functions
  */

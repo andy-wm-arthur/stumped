@@ -55,7 +55,7 @@ object neuralNet {
 			n match {
 				case 0 => aggL
 				// bug: only pass it natural numbers (efficiency)
-				case x => genVector( x-1, prng.nextDouble() :: aggL, prng)
+				case x => genVector( x-1, prng.nextGaussian() :: aggL, prng)
 			}
 		}
 
@@ -131,6 +131,8 @@ object neuralNet {
 		println("initializing network...")
 		val NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
 		
+		//for( layer <- NN.layers) println(layer)
+
 		println("output pre-training:")
 		val testOutput_pre = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
 		println(testOutput_pre)
@@ -144,6 +146,6 @@ object neuralNet {
 	}
 
 	def main (args:Array[String]) {
-		test(List(784,28,10), 10, 1)		
+		test(List(784,28,10), 200, 10)		
 	}	
 }
