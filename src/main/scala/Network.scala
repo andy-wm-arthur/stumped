@@ -43,11 +43,11 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 				case (Nil,Nil) 		=> activations
 				//	hidden layer
 				case ( l::ls, b::bs) => {
+					println("\n"+l+"\n")
 					val a = ((l multiply activations).matMap( (v: funVector) => v add b)).matVecMap(sigmoid)
 					cmptOut_r( ls, bs, a, sigmoid )
 				}
 				//	this is an error case
-
 				case (_,_)	=> { println("error: weight, bias mismatch in forwardProp()"); new funMatrix(Nil)}
 			}
 		}
@@ -59,7 +59,7 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 		 *	Takes a matrix of training points, a matrix of their labels, sigmoid and cost functions
 		 *		Forward propagates the training points together, computing an ouput matrix. Computes
 		 *		an error matrix using the labels. Back propagates the error, updating the weight matrices
-		 *		using the learning rate. Returns a new network learned on the triaing points
+		 *		using the learning rate. Returns a new network learned on the training points
 		 */
 
 		 // m = number of training points
@@ -96,7 +96,7 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 		 	}
 		 	val a = z.matVecMap(mp.sigmoid)
 		 	val weightMatrix = layer subtract (dyadic_sum( error, a).matVecMap( (d:Double) => mp.learningRate * d / m))
-			val biasVector 	 = bias subtract (matrix_sum(error)).vecMap( (d:Double) => mp.learningRate * d)
+			val biasVector 	 = bias subtract (matrix_sum(error)).vecMap( (d:Double) => mp.learningRate * d / m)
 
 		 	( weightMatrix, biasVector)
 		 }
