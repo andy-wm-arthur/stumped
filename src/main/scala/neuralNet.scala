@@ -125,9 +125,9 @@ object neuralNet {
 			0.2
 		)
 
-		println("importing trainging data...")
+		println("importing training data...")
 		val dataPnts = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST_data/MNIST5.csv")
-		println("importing trainging labels...")
+		println("importing training labels...")
 		val labels	 = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST5_labelMatrix.csv")
 
 		println("initializing network...")
