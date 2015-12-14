@@ -81,7 +81,7 @@ class funVector( val elems: List[Double] ) {
                   l match {
                         case Nil     => index
                         case l :: ls => {
-                              if (l > max) smrz( ls, cnt+1, cnt+1, l) 
+                              if (l >= max) smrz( ls, cnt, cnt+1, l) 
                               else         smrz( ls, index, cnt+1, max)
                         }
                   }
@@ -89,7 +89,7 @@ class funVector( val elems: List[Double] ) {
             def create( l: List[Double], index: Int, cnt: Int): List[Double] = {
                   l match {
                         case Nil => Nil
-                        case l :: ls => (if(cnt == index) 1 else 0) :: create( ls, index, cnt+1)
+                        case l :: ls => (if(index == cnt) 1 else 0) :: create( ls, index, cnt+1)
                   }
             }
             val (e :: es) = this.elems
