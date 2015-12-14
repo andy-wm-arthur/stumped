@@ -76,6 +76,27 @@ class funVector( val elems: List[Double] ) {
             new funVector(map_r(this.elems, f))
       }
 
+      def summarize: funVector = {
+            def smrz( l: List[Double], index: Int, cnt: Int, max: Double): Int = {
+                  l match {
+                        case Nil     => index
+                        case l :: ls => {
+                              if (l > max) smrz( ls, cnt+1, cnt+1, l) 
+                              else         smrz( ls, index, cnt+1, max)
+                        }
+                  }
+            }
+            def create( l: List[Double], index: Int, cnt: Int): List[Double] = {
+                  l match {
+                        case Nil => Nil
+                        case l :: ls => (if(cnt == index) 1 else 0) :: create( ls, index, cnt+1)
+                  }
+            }
+            val (e :: es) = this.elems
+            val i = smrz( (e :: es), -1, 0, e)
+            new funVector( create( e :: es, i, 0))
+      }
+
       def len: Int = {
             def len_r( elems: List[Double]): Int = {
                   elems match {
