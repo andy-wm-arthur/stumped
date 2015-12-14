@@ -117,7 +117,7 @@ object neuralNet {
 		train_outer( NN, epochs, batches, labelSets, mp)
 	}
 
-	def test( structure:List[Int], batchSize:Int, epochs:Int ) {
+	def test( structure:List[Int], batchSize:Int, epochs:Int, dataPnts: funMatrix, labels:funMatrix, testData:funMatrix) {
 		val sigmoid = (d:Double) => (1/(1 + exp(-d)))
 		val mp = new metaParams(
 			sigmoid,
@@ -127,16 +127,7 @@ object neuralNet {
 			2.5
 		)
 
-		println("importing training data...")
-		val dataPnts = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST_data/MNIST_10k.csv")
-		println("importing training labels...")
-		val labels	 = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/MNIST_labels/10k_lbl_matrix.csv")
-		println("importing test data...")
-		val testData = genDataMatrix("/Users/andyarthur/classes/PLC/stumped/src/main/resources/test_points.csv")
-		println("initializing network...")
 		var NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
-		
-		//for( layer <- NN.layers) println(layer)
 
 		println("\noutput pre-training:")
 		val testOutput_pre = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
@@ -151,6 +142,16 @@ object neuralNet {
 	}
 
 	def main (args:Array[String]) {
-		test(List(784,28,10), 100, 1000)		
+		val batchSize = (args(0))
+		val epochs	  = (args(1))
+
+		println("importing training data...")
+		val dataPnts = genDataMatrix(args(2) + "src/main/resources/MNIST_data/MNIST_10k.csv")
+		println("importing training labels...")
+		val labels	 = genDataMatrix(args(2) + "src/main/resources/MNIST_labels/10k_lbl_matrix.csv")
+		println("importing test data...")
+		val testData = genDataMatrix(args(2) + "src/main/resources/test_points.csv")
+
+		test(List(784,28,10), 100, 1000, dataPnts, labels, testData)		
 	}	
 }
