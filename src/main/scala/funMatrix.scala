@@ -24,22 +24,24 @@ class funMatrix( val vecs: List[funVector] ) {
 		*  transposes the left-hand-side matrix and then computes
 		*    matrix multiplication for the two matrices  
 		*/
-		def inner( lhMat: List[funVector], rhVec: funVector): List[Double] = {
+		@tailrec
+		def inner( agg:List[Double], lhMat: List[funVector], rhVec: funVector): List[Double] = {
 			/** for a right-hand col-vec: compute dot products for all
 			*    the row vecs in transpose(left-hand matrix)
 			*/
 			lhMat match {
-			case Nil     => Nil
-			case l :: ls => (l dot rhVec) :: inner( ls, rhVec)
+			case Nil     => agg.reverse
+			case l :: ls => inner((l dot rhVec) :: agg, ls, rhVec)
 			}
 		}
-		def outer( lhMat: List[funVector], rhMat: List[funVector]): List[funVector] = {
+		@tailrec
+		def outer( agg:List[funVector], lhMat: List[funVector], rhMat: List[funVector]): List[funVector] = {
 			rhMat match {
-			case Nil     => Nil
-			case r :: rs => new funVector(inner( lhMat, r)) :: outer(lhMat, rs)
+			case Nil     => agg.reverse
+			case r :: rs => outer( new funVector(inner( Nil, lhMat, r)) :: agg, lhMat, rs)
 			}
 		}
-		new funMatrix( outer( this.vecs, rhMat.vecs))
+		new funMatrix( outer( Nil, this.vecs, rhMat.vecs))
 	}
 
 	def transVecMult( vec: funVector): funVector = {
@@ -57,20 +59,21 @@ class funMatrix( val vecs: List[funVector] ) {
 	}
 
 	def matVecMap( f: Double => Double): funMatrix = {
-		def map_r( mat: List[funVector], f: Double => Double): List[funVector] = {
+		@tailrec
+		def map_r( agg:List[funVector], mat: List[funVector], f: Double => Double): List[funVector] = {
 			mat match {
-			case Nil     => Nil
-			case v :: vs => v.vecMap(f) :: map_r( vs, f)
+			case Nil     => agg.reverse
+			case v :: vs => map_r(v.vecMap(f) :: agg, vs, f)
 			}
 		}
-		new funMatrix( map_r( vecs, f))
+		new funMatrix( map_r( Nil, vecs, f))
 	}
 
 	def matMap( f: funVector => funVector): funMatrix = {
 		@tailrec
 		def map_r( agg:List[funVector], mat: List[funVector], f: funVector => funVector): List[funVector] = {
 			mat match {
-				case Nil 	 => agg
+				case Nil 	 => agg.reverse
 				case v :: vs => map_r( f(v) :: agg, vs, f)
 			}
 		}

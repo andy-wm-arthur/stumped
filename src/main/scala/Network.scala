@@ -99,8 +99,8 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 		 		mat_sum_r(mat.vecs)
 		 	}
 		 	val a = z.matVecMap(mp.sigmoid)
-		 	val weightMatrix = layer subtract (dyadic_sum( error, a).matVecMap( (d:Double) => mp.learningRate * d / m))
-			val biasVector 	 = bias subtract (matrix_sum(error)).vecMap( (d:Double) => mp.learningRate * d / m)
+		 	val weightMatrix = layer subtract ((dyadic_sum( error, a)).matVecMap( (d:Double) => mp.learningRate * d / m))
+			val biasVector 	 = bias subtract ((matrix_sum(error)).vecMap( (d:Double) => mp.learningRate * d / m))
 
 		 	( weightMatrix, biasVector)
 		 }

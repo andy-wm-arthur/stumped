@@ -59,7 +59,7 @@ object neuralNet {
 			n match {
 				case 0 => aggL
 				// bug: only pass it natural numbers (efficiency)
-				case x => genVector( x-1, prng.nextGaussian() :: aggL, prng)
+				case x => genVector( x-1, prng.nextGaussian()*0.5 :: aggL, prng)
 				// case x => genVector( x-1, 0.0 :: aggL, prng)
 			}
 		}
@@ -81,27 +81,30 @@ object neuralNet {
 		new Network( weights, biases)
 	}
 
-	def train( NN: Network, batchSize: Int, epochs: Int, trainData:funMatrix, labels:funMatrix, mp: metaParams ): Network = {
-		def train_inner(NN: Network, epochs: Int, batches: List[funMatrix], 
+	def train( NN: Network, batchSize: Int, total_iterations: Int, trainData:funMatrix, labels:funMatrix, mp: metaParams ): Network = {
+
+		def train_inner(NN: Network, iterations: Int, batches: List[funMatrix], 
 						labelSets: List[funMatrix], mp: metaParams ): (Network,Int) = {
 			/**
-			 *	Iterates through epochs stopping if the epochs or training batches are exhausted. Returns the most recently
-			 * 	trained network and the number of epochs left	
+			 *	Iterates through iterations stopping if the iterations or training batches are exhausted. Returns the most recently
+			 * 	trained network and the number of iterations left	
 			 */
-			(epochs,batches,labelSets) match {
+			(iterations,batches,labelSets) match {
 				case (0,_,_) 			=> (NN,0)
 				case (i,Nil,Nil)		=> (NN,i)
 				case (i, b::bs, l::ls)	=>{
-					if (i % 10 == 0) println("epochs left: "+i)
+					if (i % (total_iterations/50) == 0) println("iterations left: "+i)
+					if (i % (total_iterations/20)  == 0) evaluate( labels, NN.computeOutput( trainData, (d:Double) => (1/(1 + exp(-d))) ))
+
 					train_inner( NN.learn( b, l, mp), i-1, bs, ls, mp)
 				}
 				// bug: error case
 				case (_,_,_)			=> { println("error in train_inner in train") ;(new Network(Nil,Nil),0) }
 			}
 		}
-		def train_outer(NN: Network, epochs: Int, batches: List[funMatrix], 
+		def train_outer(NN: Network, iterations: Int, batches: List[funMatrix], 
 						labelSets: List[funMatrix], mp: metaParams ): Network = {
-			epochs match {
+			iterations match {
 				case 0 => NN
 				case i => {
 					val (new_net,new_i) = train_inner( NN, i, batches, labelSets, mp)
@@ -114,55 +117,49 @@ object neuralNet {
 		val batches = trainData.split(batchSize)
 		val labelSets = labels.split(batchSize)
 
-		train_outer( NN, epochs, batches, labelSets, mp)
+		train_outer( NN, total_iterations, batches, labelSets, mp)
 	}
 
-	def test( structure:List[Int], batchSize:Int, epochs:Int, dataPnts: funMatrix, labels:funMatrix, testData:funMatrix) {
+	def evaluate( labels:funMatrix, output:funMatrix) {
+		@tailrec
+		def eval_r( labels:List[funVector], output:List[funVector], correct:Int, wrong:Int) {
+			(labels,output) match {
+				case (Nil,Nil) 		=> println( "\nClassification Accuracy:\n"+ correct +" / "+ (correct+wrong) + "\n")
+				case (l::ls,o::os)  => {
+					if ( l.isEql( o.summarize)) eval_r( ls, os, correct+1, wrong)
+					else 						eval_r( ls, os, correct, wrong+1)
+
+				}
+				case (_,_) => return
+			}
+		}
+		eval_r( labels.vecs, output.vecs, 0, 0)
+	}
+
+	def test( structure:List[Int], batchSize:Int, iterations:Int, dataPnts: funMatrix, labels:funMatrix, testData:funMatrix) {
 		val sigmoid = (d:Double) => (1/(1 + exp(-d)))
 		val mp = new metaParams(
 			sigmoid,
 			(d:Double) => sigmoid(d) * (1-sigmoid(d)),
 			(m1:funMatrix,m2:funMatrix) => m1,	// dummy cost function
 			(m1:funMatrix,m2:funMatrix) => m1 subtract m2,
-			2.5
+			1.0
 		)
 
 		var NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
 
-		println("\noutput pre-training:")
-		val testOutput_pre = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
-		println(testOutput_pre)
+		println("\ntraining...")
+		NN = train( NN, batchSize, iterations, dataPnts, labels, mp)
 
-		println("training...")
-		NN = train( NN, batchSize, epochs, dataPnts, labels, mp)
+		val testOutput = NN.computeOutput( dataPnts, (d:Double) => (1/(1 + exp(-d))) )
 
-		println("\noutput post-training:")
-		val testOutput_post = NN.computeOutput( dataPnts, (d:Double) => (1/(1 + exp(-d))) )
-
-		println( evaluate( labels, testOutput_post))
+		evaluate( labels, testOutput)
 		
-	}
-
-	def evaluate( labels:funMatrix, output:funMatrix): Double = {
-		@tailrec
-		def eval_r( labels:List[funVector], output:List[funVector], correct:Int, wrong:Int): Double = {
-			(labels,output) match {
-				case (Nil,Nil) 		=> (correct/(correct+wrong))
-				case (l::ls,o::os)  => {
-					if ( l.isEql( o.summarize)) eval_r( ls, os, correct+1, wrong)
-					else 						eval_r( ls, os, correct, wrong+1)
-
-				}
-				case (_,_) => -1.0
-			}
-		}
-		eval_r( labels.vecs, output.vecs, 0, 0)
 	}
 
 	def main (args:Array[String]) {
 		val batchSize = (args(0)).toInt
-		val epochs	  = (args(1)).toInt
-
+		val iterations	  = (args(1)).toInt
 		println("importing training data...")
 		val dataPnts = genDataMatrix(args(2) + "src/main/resources/MNIST_data/MNIST_10k.csv")
 		println("importing training labels...")
@@ -170,6 +167,7 @@ object neuralNet {
 		println("importing test data...")
 		val testData = genDataMatrix(args(2) + "src/main/resources/test_points.csv")
 
-		test(List(784,28,10), batchSize, epochs, dataPnts, labels, testData)		
+
+		test(List(784,28,10), batchSize, iterations, dataPnts, labels, testData)		
 	}	
 }
