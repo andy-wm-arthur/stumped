@@ -3,6 +3,8 @@
 * @author Ramya Puliadi
 */
 
+import scala.annotation.tailrec
+
 class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 
 
@@ -11,6 +13,7 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 		 * 	Computes the output for a single input data point
 		 *		a(l+1) = sigmoid( w(l+1) * a(l) + bias(l+1))
 		 */
+		@tailrec
 		def cmptOut_r( layers: List[funMatrix], biases: List[funVector], 
 					 activations: funVector, sigmoid: Double => Double): funVector = {
 
@@ -35,6 +38,7 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 		 * 	Computes the output for a matrix of data points
 		 *		a(l+1) = sigmoid( w(l+1) * a(l) + bias(l+1))
 		 */
+		@tailrec
 		def cmptOut_r( layers: List[funMatrix], biases: List[funVector], 
 					 activations: funMatrix, sigmoid: Double => Double): funMatrix = {
 
@@ -43,7 +47,7 @@ class Network( val layers: List[funMatrix], val biases: List[funVector]) {
 				case (Nil,Nil) 		=> activations
 				//	hidden layer
 				case ( l::ls, b::bs) => {
-					println("\n"+l+"\n")
+					// println("\n"+l+"\n")
 					val a = ((l multiply activations).matMap( (v: funVector) => v add b)).matVecMap(sigmoid)
 					cmptOut_r( ls, bs, a, sigmoid )
 				}

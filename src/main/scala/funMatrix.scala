@@ -3,12 +3,13 @@
 * @author Ramya Puliadi
 */
 
-// import java.text.DecimalFormat
 
 /**	@TODO 
  *	implement folder and binary map functions
  *	format doubles in matrix prn
  */
+
+import scala.annotation.tailrec
 
 class funMatrix( val vecs: List[funVector] ) {
 	/**
@@ -66,13 +67,14 @@ class funMatrix( val vecs: List[funVector] ) {
 	}
 
 	def matMap( f: funVector => funVector): funMatrix = {
-		def map_r( mat: List[funVector], f: funVector => funVector): List[funVector] = {
+		@tailrec
+		def map_r( agg:List[funVector], mat: List[funVector], f: funVector => funVector): List[funVector] = {
 			mat match {
-				case Nil 	 => Nil
-				case v :: vs => f(v) :: map_r( vs, f)
+				case Nil 	 => agg
+				case v :: vs => map_r( f(v) :: agg, vs, f)
 			}
 		}
-		new funMatrix( map_r( vecs, f))
+		new funMatrix( map_r( Nil, vecs, f))
 	}
 
 	def transpose: funMatrix = {

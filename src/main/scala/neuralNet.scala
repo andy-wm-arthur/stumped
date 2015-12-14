@@ -144,6 +144,7 @@ object neuralNet {
 	}
 
 	def evaluate( labels:funMatrix, output:funMatrix): Double = {
+		@tailrec
 		def eval_r( labels:List[funVector], output:List[funVector], correct:Int, wrong:Int): Double = {
 			(labels,output) match {
 				case (Nil,Nil) 		=> (correct/(correct+wrong))
