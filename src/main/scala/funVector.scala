@@ -92,9 +92,11 @@ class funVector( val elems: List[Double] ) {
                         case l :: ls => (if(index == cnt) 1 else 0) :: create( ls, index, cnt+1)
                   }
             }
-            val (e :: es) = this.elems
-            val i = smrz( (e :: es), -1, 0, e)
-            new funVector( create( e :: es, i, 0))
+
+            elems match {
+                  case Nil          => new funVector(Nil)
+                  case (e :: es)    => new funVector( create( e::es, smrz( e::es, -1, 0, e), 0))
+            }
       }
 
       def len: Int = {
@@ -111,10 +113,11 @@ class funVector( val elems: List[Double] ) {
             def isEql_r (rhs:List[Double], lhs:List[Double]) : Boolean = {
                   (rhs, lhs) match {
                         case (Nil,Nil)       => true
-                        case ( l::ls, r::rs) => if (l == r) {isEql_r(ls, rs)} else {false}
-                        case (_,_)           => {println("error: size mismatch in funVector isEql"); Nil}
+                        case ( l::ls, r::rs) => if (l == r) isEql_r(ls, rs) else false
+                        case (_,_)           => {println("error: size mismatch in funVector isEql"); false}
                   }
             }
+            isEql_r( this.elems, rhs.elems)
       }
 
       override def toString() : String = "[ " + elems.mkString(" ") + " ]"
