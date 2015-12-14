@@ -7,7 +7,7 @@
 
 /**	@TODO 
  *	implement folder and binary map functions
- *	format doubles in matrix printing
+ *	format doubles in matrix prn
  */
 
 class funMatrix( val vecs: List[funVector] ) {
