@@ -92,7 +92,7 @@ object neuralNet {
 				case (0,_,_) 			=> (NN,0)
 				case (i,Nil,Nil)		=> (NN,i)
 				case (i, b::bs, l::ls)	=>{
-					if (i % 500 == 0) println("epochs left: "+i)
+					if (i % 10 == 0) println("epochs left: "+i)
 					train_inner( NN.learn( b, l, mp), i-1, bs, ls, mp)
 				}
 				// bug: error case
@@ -137,13 +137,30 @@ object neuralNet {
 		NN = train( NN, batchSize, epochs, dataPnts, labels, mp)
 
 		println("\noutput post-training:")
-		val testOutput_post = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
-		println(testOutput_post)
+		val testOutput_post = NN.computeOutput( dataPnts, (d:Double) => (1/(1 + exp(-d))) )
+
+		println( evaluate( labels, testOutput_post))
+		
+	}
+
+	def evaluate( labels:funMatrix, output:funMatrix): Double = {
+		def eval_r( labels:List[funVector], output:List[funVector], correct:Int, wrong:Int): Double = {
+			(labels,output) match {
+				case (Nil,Nil) 		=> (correct/(correct+wrong))
+				case (l::ls,o::os)  => {
+					if ( l.isEql( o.summarize)) eval_r( ls, os, correct+1, wrong)
+					else 						eval_r( ls, os, correct, wrong+1)
+
+				}
+				case (_,_) => -1.0
+			}
+		}
+		eval_r( labels.vecs, output.vecs, 0, 0)
 	}
 
 	def main (args:Array[String]) {
-		val batchSize = (args(0))
-		val epochs	  = (args(1))
+		val batchSize = (args(0)).toInt
+		val epochs	  = (args(1)).toInt
 
 		println("importing training data...")
 		val dataPnts = genDataMatrix(args(2) + "src/main/resources/MNIST_data/MNIST_10k.csv")
@@ -152,6 +169,6 @@ object neuralNet {
 		println("importing test data...")
 		val testData = genDataMatrix(args(2) + "src/main/resources/test_points.csv")
 
-		test(List(784,28,10), 100, 1000, dataPnts, labels, testData)		
+		test(List(784,28,10), batchSize, epochs, dataPnts, labels, testData)		
 	}	
 }
