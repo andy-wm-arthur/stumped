@@ -107,5 +107,15 @@ class funVector( val elems: List[Double] ) {
             len_r(elems)
       }
 
+      def isEql(rhs: funVector): Boolean = {
+            def isEql_r (rhs:List[Double], lhs:List[Double]) : Boolean = {
+                  (rhs, lhs) match {
+                        case (Nil,Nil)       => true
+                        case ( l::ls, r::rs) => if (l == r) {isEql_r(ls, rs)} else {false}
+                        case (_,_)           => {println("error: size mismatch in funVector isEql"); Nil}
+                  }
+            }
+      }
+
       override def toString() : String = "[ " + elems.mkString(" ") + " ]"
 }
