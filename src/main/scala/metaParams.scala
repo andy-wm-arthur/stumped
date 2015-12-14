@@ -7,5 +7,5 @@ class metaParams(
 		val sigPrime: Double => Double,
 		val costFunc: (funMatrix, funMatrix) => funMatrix,  
 		val costPrime: (funMatrix, funMatrix) => funMatrix,
-		val learningRate: Double
+		var learningRate: Double
 	) {}

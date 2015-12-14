@@ -93,7 +93,7 @@ object neuralNet {
 				case (0,_,_) 			=> (NN,0)
 				case (i,Nil,Nil)		=> (NN,i)
 				case (i, b::bs, l::ls)	=>{
-					if (i % (total_iterations/50) == 0) println("iterations left: "+i)
+					if (i % (total_iterations/80) == 0) println("iterations left: "+i)
 					if (i % (total_iterations/20)  == 0) evaluate( labels, NN.computeOutput( trainData, (d:Double) => (1/(1 + exp(-d))) ))
 
 					train_inner( NN.learn( b, l, mp), i-1, bs, ls, mp)
@@ -108,6 +108,8 @@ object neuralNet {
 				case 0 => NN
 				case i => {
 					val (new_net,new_i) = train_inner( NN, i, batches, labelSets, mp)
+					mp.learningRate = mp.learningRate*.5
+					println("\nnew learning rate: " + mp.learningRate + "\n")
 					train_outer( new_net, new_i, batches, labelSets, mp)
 				}
 			}
@@ -143,7 +145,7 @@ object neuralNet {
 			(d:Double) => sigmoid(d) * (1-sigmoid(d)),
 			(m1:funMatrix,m2:funMatrix) => m1,	// dummy cost function
 			(m1:funMatrix,m2:funMatrix) => m1 subtract m2,
-			1.0
+			3.0
 		)
 
 		var NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
