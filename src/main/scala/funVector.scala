@@ -82,7 +82,7 @@ class funVector( val elems: List[Double] ) {
                         case Nil     => index
                         case l :: ls => {
                               if (l >= max) smrz( ls, cnt, cnt+1, l) 
-                              else         smrz( ls, index, cnt+1, max)
+                              else          smrz( ls, index, cnt+1, max)
                         }
                   }
             }
