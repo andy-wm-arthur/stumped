@@ -108,8 +108,8 @@ object neuralNet {
 				case 0 => NN
 				case i => {
 					val (new_net,new_i) = train_inner( NN, i, batches, labelSets, mp)
-					mp.learningRate = mp.learningRate*.5
-					println("\nnew learning rate: " + mp.learningRate + "\n")
+					mp.learningRate = mp.learningRate*.9
+					println("new learning rate: " + mp.learningRate)
 					train_outer( new_net, new_i, batches, labelSets, mp)
 				}
 			}
@@ -138,14 +138,16 @@ object neuralNet {
 		eval_r( labels.vecs, output.vecs, 0, 0)
 	}
 
-	def test( structure:List[Int], batchSize:Int, iterations:Int, dataPnts: funMatrix, labels:funMatrix, testData:funMatrix) {
+	def test( structure:List[Int], batchSize:Int, iterations:Int, 
+				dataPnts: funMatrix, labels:funMatrix, testData:funMatrix, testLabels: funMatrix) {
+
 		val sigmoid = (d:Double) => (1/(1 + exp(-d)))
 		val mp = new metaParams(
 			sigmoid,
 			(d:Double) => sigmoid(d) * (1-sigmoid(d)),
 			(m1:funMatrix,m2:funMatrix) => m1,	// dummy cost function
 			(m1:funMatrix,m2:funMatrix) => m1 subtract m2,
-			3.0
+			2.0
 		)
 
 		var NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
@@ -153,9 +155,9 @@ object neuralNet {
 		println("\ntraining...")
 		NN = train( NN, batchSize, iterations, dataPnts, labels, mp)
 
-		val testOutput = NN.computeOutput( dataPnts, (d:Double) => (1/(1 + exp(-d))) )
+		val testOutput = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
 
-		evaluate( labels, testOutput)
+		evaluate( testLabels, testOutput)
 		
 	}
 
@@ -163,11 +165,13 @@ object neuralNet {
 		val batchSize = (args(0)).toInt
 		val iterations	  = (args(1)).toInt
 		println("importing training data...")
-		val dataPnts = genDataMatrix(args(2) + "src/main/resources/MNIST_data/MNIST_10k.csv")
+		val dataPnts = genDataMatrix(args(2) + "src/main/resources/MNIST_data/first10k.csv")
 		println("importing training labels...")
-		val labels	 = genDataMatrix(args(2) + "src/main/resources/MNIST_labels/10k_lbl_matrix.csv")
+		val labels	 = genDataMatrix(args(2) + "src/main/resources/MNIST_labels/first10k_labels.csv")
 		println("importing test data...")
-		val testData = genDataMatrix(args(2) + "src/main/resources/test_points.csv")
+		val testData = genDataMatrix(args(2) + "src/main/resources/MNIST_data/second10k.csv")
+		println("importing test labels...")
+		val testData = genDataMatrix(args(2) + "src/main/resources/MNIST_labels/second10k_labels.csv")
 
 
 		test(List(784,28,10), batchSize, iterations, dataPnts, labels, testData)		
