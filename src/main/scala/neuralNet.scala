@@ -108,7 +108,7 @@ object neuralNet {
 				case 0 => NN
 				case i => {
 					val (new_net,new_i) = train_inner( NN, i, batches, labelSets, mp)
-					mp.learningRate = mp.learningRate*.9
+					mp.learningRate = mp.learningRate
 					println("new learning rate: " + mp.learningRate)
 					train_outer( new_net, new_i, batches, labelSets, mp)
 				}
@@ -126,7 +126,7 @@ object neuralNet {
 		@tailrec
 		def eval_r( labels:List[funVector], output:List[funVector], correct:Int, wrong:Int) {
 			(labels,output) match {
-				case (Nil,Nil) 		=> println( "\nClassification Accuracy:\n"+ correct +" / "+ (correct+wrong) + "\n")
+				case (Nil,Nil) 		=> println( "Classification Accuracy:\n"+ correct +" / "+ (correct+wrong))
 				case (l::ls,o::os)  => {
 					if ( l.isEql( o.summarize)) eval_r( ls, os, correct+1, wrong)
 					else 						eval_r( ls, os, correct, wrong+1)
@@ -147,7 +147,7 @@ object neuralNet {
 			(d:Double) => sigmoid(d) * (1-sigmoid(d)),
 			(m1:funMatrix,m2:funMatrix) => m1,	// dummy cost function
 			(m1:funMatrix,m2:funMatrix) => m1 subtract m2,
-			2.0
+			0.5
 		)
 
 		var NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
@@ -157,6 +157,7 @@ object neuralNet {
 
 		val testOutput = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
 
+		println("\n\nTest Set Evaluation")
 		evaluate( testLabels, testOutput)
 		
 	}
@@ -171,9 +172,9 @@ object neuralNet {
 		println("importing test data...")
 		val testData = genDataMatrix(args(2) + "src/main/resources/MNIST_data/second10k.csv")
 		println("importing test labels...")
-		val testData = genDataMatrix(args(2) + "src/main/resources/MNIST_labels/second10k_labels.csv")
+		val testLabels = genDataMatrix(args(2) + "src/main/resources/MNIST_labels/second10k_labels.csv")
 
 
-		test(List(784,28,10), batchSize, iterations, dataPnts, labels, testData)		
+		test(List(784,40,30,10,10), batchSize, iterations, dataPnts, labels, testData, testLabels)		
 	}	
 }
