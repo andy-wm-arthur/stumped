@@ -3,11 +3,13 @@
 * @author Ramya Puliadi
 */
 
-import scala.io.Source
+import scala.io._
+import java.io._
 import scala.util.Random
+import scala.math._
 import scala.compat.Platform
 import scala.annotation.tailrec
-import scala.math._
+
 
 
 object neuralNet {
@@ -23,7 +25,7 @@ object neuralNet {
 	 *	cleanup resource directory
 	 */
 
-	def genDataMatrix( path:String): funMatrix = {
+	def genDataMatrix( file: InputStream): funMatrix = {
 		@tailrec
 		def cvtVec (agg: List[funVector], matrix:List[List[Double]]): List[funVector] = {
 
@@ -32,7 +34,7 @@ object neuralNet {
 				case l::ls 	=> cvtVec( new funVector(l) :: agg, ls)
 			}
 		}
-		val lst2d: List[List[Double]] = Source.fromFile(path)
+		val lst2d: List[List[Double]] = Source.fromInputStream(file)
 							.getLines.toList
 							.map(_.split(",").map(_.trim.toDouble)
 							.toList)
@@ -81,10 +83,9 @@ object neuralNet {
 		new Network( weights, biases)
 	}
 
-	def train( NN: Network, batchSize: Int, total_iterations: Int, trainData:funMatrix, labels:funMatrix, mp: metaParams ): Network = {
+	def train( NN: Network, mp: metaParams, trainData:funMatrix, labels:funMatrix): Network = {
 
-		def train_inner(NN: Network, iterations: Int, batches: List[funMatrix], 
-						labelSets: List[funMatrix], mp: metaParams ): (Network,Int) = {
+		def train_inner(NN: Network, iterations: Int, batches: List[funMatrix], labelSets: List[funMatrix], mp: metaParams ): (Network,Int) = {
 			/**
 			 *	Iterates through iterations stopping if the iterations or training batches are exhausted. Returns the most recently
 			 * 	trained network and the number of iterations left	
@@ -93,8 +94,8 @@ object neuralNet {
 				case (0,_,_) 			=> (NN,0)
 				case (i,Nil,Nil)		=> (NN,i)
 				case (i, b::bs, l::ls)	=>{
-					if (i % (total_iterations/80) == 0) println("iterations left: "+i)
-					if (i % (total_iterations/20)  == 0) evaluate( labels, NN.computeOutput( trainData, (d:Double) => (1/(1 + exp(-d))) ))
+					if (i % (mp.iterations/80) == 0) println("iterations left: "+i)
+					if (i % (mp.iterations/20)  == 0) evaluate( labels, NN.computeOutput( trainData, mp.sigmoid ))
 
 					train_inner( NN.learn( b, l, mp), i-1, bs, ls, mp)
 				}
@@ -108,18 +109,20 @@ object neuralNet {
 				case 0 => NN
 				case i => {
 					val (new_net,new_i) = train_inner( NN, i, batches, labelSets, mp)
-					mp.learningRate = mp.learningRate
-					println("new learning rate: " + mp.learningRate)
+					
+					mp.learningRate = (mp.lr_scale * mp.learningRate )
+					if(mp.lr_scale != 1.0) println("new learning rate: "+mp.learningRate)
+
 					train_outer( new_net, new_i, batches, labelSets, mp)
 				}
 			}
 
 		}
 
-		val batches = trainData.split(batchSize)
-		val labelSets = labels.split(batchSize)
+		val batches = trainData.split(mp.batchSize)
+		val labelSets = labels.split(mp.batchSize)
 
-		train_outer( NN, total_iterations, batches, labelSets, mp)
+		train_outer( NN, mp.iterations, batches, labelSets, mp)
 	}
 
 	def evaluate( labels:funMatrix, output:funMatrix) {
@@ -138,24 +141,14 @@ object neuralNet {
 		eval_r( labels.vecs, output.vecs, 0, 0)
 	}
 
-	def test( structure:List[Int], batchSize:Int, iterations:Int, 
-				dataPnts: funMatrix, labels:funMatrix, testData:funMatrix, testLabels: funMatrix) {
+	def test( mp: metaParams, dataPnts: funMatrix, labels:funMatrix, testData:funMatrix, testLabels: funMatrix) {
 
-		val sigmoid = (d:Double) => (1/(1 + exp(-d)))
-		val mp = new metaParams(
-			sigmoid,
-			(d:Double) => sigmoid(d) * (1-sigmoid(d)),
-			(m1:funMatrix,m2:funMatrix) => m1,	// dummy cost function
-			(m1:funMatrix,m2:funMatrix) => m1 subtract m2,
-			0.5
-		)
-
-		var NN 		= genNeuralNetwork( List(784,28,10), new Random(Platform.currentTime))
+		var NN = genNeuralNetwork( mp.structure, new Random(Platform.currentTime))
 
 		println("\ntraining...")
-		NN = train( NN, batchSize, iterations, dataPnts, labels, mp)
+		NN = train( NN, mp, dataPnts, labels)
 
-		val testOutput = NN.computeOutput( testData, (d:Double) => (1/(1 + exp(-d))) )
+		val testOutput = NN.computeOutput( testData, mp.sigmoid )
 
 		println("\n\nTest Set Evaluation")
 		evaluate( testLabels, testOutput)
@@ -163,18 +156,30 @@ object neuralNet {
 	}
 
 	def main (args:Array[String]) {
-		val batchSize = (args(0)).toInt
-		val iterations	  = (args(1)).toInt
-		println("importing training data...")
-		val dataPnts = genDataMatrix(args(2) + "src/main/resources/MNIST_data/first10k.csv")
+
+		val mp = new metaParams(
+
+			if(args.size > 0) (args(0)).toInt else 10,												//	mini-batch size
+			if(args.size > 1) (args(1)).toInt else 10000,											//	iterations
+			if(args.size > 2) (args(2)).toDouble else 0.2,											//	initial learning rate
+			if(args.size > 3) (args(3)).toDouble else 1.0,											//	learning rate scale
+			if(args.size > 4) (args(4)).split(",").toList.map(_.toInt) else List(784,28,10),		//	layer structure
+			(d:Double) => (1/(1 + exp(-d))),														//	sigmoid
+			(d:Double) => (1/(1 + exp(-d))) * (1-(1/(1 + exp(-d)))),								//	sigmoid prime
+			(m1:funMatrix,m2:funMatrix) => m1 subtract m2											//	costPrime
+		)
+
+
+		println("\nimporting training data...")
+		val dataPnts = genDataMatrix( getClass.getResourceAsStream("MNIST_data/first10k.csv"))
 		println("importing training labels...")
-		val labels	 = genDataMatrix(args(2) + "src/main/resources/MNIST_labels/first10k_labels.csv")
+		val labels	 = genDataMatrix( getClass.getResourceAsStream("MNIST_labels/first10k_labels.csv"))
 		println("importing test data...")
-		val testData = genDataMatrix(args(2) + "src/main/resources/MNIST_data/second10k.csv")
+		val testData = genDataMatrix( getClass.getResourceAsStream("MNIST_data/second10k.csv"))
 		println("importing test labels...")
-		val testLabels = genDataMatrix(args(2) + "src/main/resources/MNIST_labels/second10k_labels.csv")
+		val testLabels = genDataMatrix( getClass.getResourceAsStream("MNIST_labels/second10k_labels.csv"))
 
 
-		test(List(784,40,30,10,10), batchSize, iterations, dataPnts, labels, testData, testLabels)		
+		test( mp, dataPnts, labels, testData, testLabels)		
 	}	
 }
