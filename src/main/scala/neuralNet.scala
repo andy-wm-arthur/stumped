@@ -144,9 +144,9 @@ object neuralNet {
 	def test( mp: metaParams, dataPnts: funMatrix, labels:funMatrix, testData:funMatrix, testLabels: funMatrix) {
 
 		// var NN = genNeuralNetwork( mp.structure, new Random(Platform.currentTime))
-		var NN = genNeuralNetwork( mp.structure, new Random(42))
+		var NN = genNeuralNetwork( mp.structure, new Random(101))
 
-		println("\nmeta-parameters: "+mp.batchSize+" : "+mp.iterations+" : "+mp.learningRate+" : "+mp.lr_scale+" : "+mp.structure+"\n")
+		println("\nmeta-parameters: "+mp.batchSize+" : "+mp.iterations+" : "+mp.learningRate+" : "+mp.lr_scale+" : "+mp.structure)
 
 		println("\ntraining...")
 		NN = train( NN, mp, dataPnts, labels)
@@ -155,7 +155,7 @@ object neuralNet {
 
 		println("\n\nTest Set Evaluation")
 		evaluate( testLabels, testOutput)
-		
+		println("\n")		
 	}
 
 	def main (args:Array[String]) {
