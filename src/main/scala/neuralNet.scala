@@ -94,7 +94,7 @@ object neuralNet {
 				case (0,_,_) 			=> (NN,0)
 				case (i,Nil,Nil)		=> (NN,i)
 				case (i, b::bs, l::ls)	=>{
-					if (i % (mp.iterations/80) == 0) println("iterations left: "+i)
+					if (i % (mp.iterations/100) == 0) println("iterations left: "+i)
 					if (i % (mp.iterations/20)  == 0) evaluate( labels, NN.computeOutput( trainData, mp.sigmoid ))
 
 					train_inner( NN.learn( b, l, mp), i-1, bs, ls, mp)
@@ -143,7 +143,10 @@ object neuralNet {
 
 	def test( mp: metaParams, dataPnts: funMatrix, labels:funMatrix, testData:funMatrix, testLabels: funMatrix) {
 
-		var NN = genNeuralNetwork( mp.structure, new Random(Platform.currentTime))
+		// var NN = genNeuralNetwork( mp.structure, new Random(Platform.currentTime))
+		var NN = genNeuralNetwork( mp.structure, new Random(42))
+
+		println("\nmeta-parameters: "+mp.batchSize+" : "+mp.iterations+" : "+mp.learningRate+" : "+mp.lr_scale+" : "+mp.structure+"\n")
 
 		println("\ntraining...")
 		NN = train( NN, mp, dataPnts, labels)
